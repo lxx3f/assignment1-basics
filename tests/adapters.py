@@ -99,7 +99,7 @@ def run_swiglu(
 def run_scaled_dot_product_attention(
     Q: Float[Tensor, " ... queries d_k"],
     K: Float[Tensor, " ... keys d_k"],
-    V: Float[Tensor, " ... values d_v"],
+    V: Float[Tensor, " ... keys d_v"],
     mask: Bool[Tensor, " ... queries keys"] | None = None,
 ) -> Float[Tensor, " ... queries d_v"]:
     """
@@ -109,7 +109,7 @@ def run_scaled_dot_product_attention(
     Args:
         Q (Float[Tensor, " ... queries d_k"]): Query tensor
         K (Float[Tensor, " ... keys d_k"]): Key tensor
-        V (Float[Tensor, " ... values d_v"]): Values tensor
+        V (Float[Tensor, " ... keys d_v"]): Values tensor
         mask (Bool[Tensor, " ... queries keys"] | None): Mask tensor
     Returns:
         Float[Tensor, " ... queries d_v"]: Output of SDPA
@@ -288,13 +288,13 @@ def run_transformer_block(
                 Shape is (d_model,).
             - `ffn.w1.weight`
                 Weight of the first linear transformation in the FFN.
-                Shape is (d_model, d_ff).
+                Shape is (d_ff, d_model).
             - `ffn.w2.weight`
                 Weight of the second linear transformation in the FFN.
-                Shape is (d_ff, d_model).
+                Shape is (d_model, d_ff).
             - `ffn.w3.weight`
                 Weight of the third linear transformation in the FFN.
-                Shape is (d_model, d_ff).
+                Shape is (d_ff, d_model).
             - `ln2.weight`
                 Weights of affine transform for the second RMSNorm
                 applied in the transformer block.
@@ -351,7 +351,7 @@ def run_transformer_lm(
         num_heads (int): Number of heads to use in multi-headed attention. `d_model` must be
             evenly divisible by `num_heads`.
         d_ff (int): Dimensionality of the feed-forward inner layer (section 3.3).
-        rope_theta (float): The RoPE $\Theta$ parameter.
+        rope_theta (float): The RoPE $\\Theta$ parameter.
         weights (dict[str, Tensor]):
             State dict of our reference implementation. {num_layers} refers to an
             integer between `0` and `num_layers - 1` (the layer index).
@@ -382,13 +382,13 @@ def run_transformer_lm(
                 Shape is (d_model,).
             - `layers.{num_layers}.ffn.w1.weight`
                 Weight of the first linear transformation in the FFN.
-                Shape is (d_model, d_ff).
+                Shape is (d_ff, d_model).
             - `layers.{num_layers}.ffn.w2.weight`
                 Weight of the second linear transformation in the FFN.
-                Shape is (d_ff, d_model).
+                Shape is (d_model, d_ff).
             - `layers.{num_layers}.ffn.w3.weight`
                 Weight of the third linear transformation in the FFN.
-                Shape is (d_model, d_ff).
+                Shape is (d_ff, d_model).
             - `layers.{num_layers}.ln2.weight`
                 Weights of affine transform for the second RMSNorm
                 applied in the transformer block.
