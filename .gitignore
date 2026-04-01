@@ -161,3 +161,12 @@ cython_debug/
 
 .ruff_cache/
 *.zip
+
+# data
+data/
+.claude/
+checkpoints/
+__pycache__/
+swanlog/
+CLAUDE.md
+tokenizer/
