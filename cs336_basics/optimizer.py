@@ -38,13 +38,20 @@ def testSGD(lr):
 class AdamW(Optimizer):
     """
     AdamW 优化器。
+
+    公式:
+        m_t = beta1 * m_{t-1} + (1 - beta1) * g_t
+        v_t = beta2 * v_{t-1} + (1 - beta2) * g_t^2
+        m_cap_t = m_t / (1 - beta1^t)
+        v_cap_t = v_t / (1 - beta2^t)
+        w_t = w_{t-1} - lr * m_cap_t / (sqrt(v_cap_t) + eps)
     """
     def __init__(self, params, lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.01):
         """
 
         参数:
             params: 待优化的参数组。
-            lr: 学习率。
+            lr: 学习率，默认值为 1e-3。
             betas: beta1 和 beta2 的值。
             eps: 误差项。
             weight_decay: 权重衰减。
@@ -117,7 +124,7 @@ class AdamW(Optimizer):
                 # p.add_(other, alpha=1.0) p=p+(alpha×other)
                 if wd != 0:
                     p.add_(p, alpha=-lr * wd)
-
+        # loss是接口占位符，在这里无实际作用，只是为了符合pytorch的optimizer设计规范
         return loss
 
 
@@ -125,11 +132,9 @@ def clip_gradient_norm(parameters: Iterable[torch.nn.Parameter], max_norm: float
     """
     实现梯度裁剪（Global Norm Clipping）。
     
-    参数:
+    Args:
         parameters: 可迭代的参数列表（通常是 model.parameters()）
         max_norm: 允许的最大梯度的 L2 范数 (M)
-    想象你在下山（优化模型），正常的步子很稳。但突然遇到一个极陡的悬崖（梯度爆炸），如果不加控制，你这一步跨出去可能会直接飞出景区（权重更新过大，Loss 变成 NaN）。
-    梯度裁剪就像一个**“自动刹车系统”**：它会检查你所有步子的总长度。如果总长度超过了安全阈值 M，它就把你的步子按比例收回来，确保你依然走在正确的方向上，但步长在安全范围内。
     """
     # 1. 过滤掉没有梯度的参数
     params_with_grad = [p for p in parameters if p.grad is not None]
