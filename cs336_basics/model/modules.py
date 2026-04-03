@@ -464,6 +464,7 @@ class TransformerLM(nn.Module):
             dtype: 模型参数的数据类型。
         """
         super().__init__()
+        self.max_seq_len = max_seq_len
         self.embedding = Embedding(vocab_size, d_model, device=device, dtype=dtype)
         self.layers = nn.Sequential(
             *[
