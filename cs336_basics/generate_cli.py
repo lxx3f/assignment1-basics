@@ -123,19 +123,19 @@ def main():
     model_group.add_argument(
         "--checkpoint",
         type=str,
-        required=True,
+        default="checkpoints/final_model.pt",
         help="模型检查点文件路径",
     )
     model_group.add_argument(
         "--tokenizer_vocab",
         type=str,
-        required=True,
+        default="tokenizer/ts_vocab.pkl",
         help="分词器词表文件路径 (.pkl)",
     )
     model_group.add_argument(
         "--tokenizer_merges",
         type=str,
-        required=True,
+        default="tokenizer/ts_merges.pkl",
         help="分词器合并规则文件路径 (.pkl)",
     )
     model_group.add_argument(
@@ -151,8 +151,8 @@ def main():
     gen_group.add_argument(
         "--prompt",
         type=str,
-        required=True,
-        help="输入提示文本",
+        default=None,
+        help="输入提示文本（非交互模式下必需）",
     )
     gen_group.add_argument(
         "--max_tokens",
@@ -200,6 +200,10 @@ def main():
     )
 
     args = parser.parse_args()
+
+    # 验证参数：非交互模式下必须提供 prompt
+    if not args.interactive and args.prompt is None:
+        parser.error("非交互模式下必须使用 --prompt 提供输入文本")
 
     # 加载分词器
     print(f"加载分词器...")
